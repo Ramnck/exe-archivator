@@ -2,11 +2,11 @@
 #include<fstream>
 #include<windows.h>
 #include"source_code.h"
-
+;
 using namespace std;
 
 long filesize(FILE * &file) {
-    fseek(file , 0 , SEEK_END);                          // устанавливаем позицию в конец файла
+    fseek(file , 0 , SEEK_END);
     long size = ftell(file);
     rewind(file);
     return size;
@@ -36,11 +36,25 @@ int main(int argc, char **argv) {
     int offset = 0;
     // Определяем позицию байта с которой начинается информация (offset)
     FILE * source = fopen("temp_a.c", "w+"), *compiled;
+
+    if (!source) {
+        printf("Error occured creating source temp.c file");
+        return 1;
+    }
+    // printf(source_code, offset);
     fprintf(source, source_code, offset);
     fclose(source);
+    // printf("Now its gonna be gcc temp_a.exe\n");
+#ifdef WIN32
     system("gcc -s -g0 temp_a.c -o temp_a.exe");
-    while(!(compiled = fopen("temp_a.exe", "r")))
+    while(!(compiled = fopen("temp_a.exe", "r"))) {
+#else
+    system("gcc -s -g0 temp_a.c -o temp_a.out");
+    while(!(compiled = fopen("temp_a.out", "r"))) {
+#endif
+        // printf("wait\n");
         Sleep(10);
+    }
     offset = filesize(compiled);
     fclose(compiled);
     // cout << offset;
@@ -48,25 +62,25 @@ int main(int argc, char **argv) {
     source = fopen("temp_a.c", "w+");
     fprintf(source, source_code, offset);
     fclose(source);
+#ifdef WIN32
     system("gcc -s -g0 temp_a.c -o exec-me.exe");
     while(!(compiled = fopen("exec-me.exe", "rb+")))
         Sleep(10);
-    system("del temp_a.c");
-    system("del temp_a.exe");
+    system("del /q temp_a.c");
+    system("del /q temp_a.exe");
+#else
+    system("gcc -s -g0 temp_a.c -o exec-me.out");
+    while(!(compiled = fopen("exec-me.out", "rb+")))
+        Sleep(10);
+    system("rm temp_a.c")
+    system("rm temp_a.out")
+#endif
     // Скомпилировали конечный исполняемый файл
     char num_of_files = argc - 1;
     fseek(compiled , 0 , SEEK_END);
     fwrite(&num_of_files,1,1,compiled);
     for (int i = 1; i <= num_of_files; i++) 
         writeFile(argv[i], compiled);
-    
-    // fwrite(data, 1, sizeof(data), ofile);
-    // strcat(str, "asdkuj");
-    // cout << str;
-    // system("echo off");
-    // system(argv[1]);
-    // fclose(source);
     fclose(compiled);
-    // fclose(source);
     return 0;
 }
