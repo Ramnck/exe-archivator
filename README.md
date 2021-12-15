@@ -6,7 +6,7 @@ make
 ```
 ## Usage-to-pack: 
 ```sh
-exe-archivator [files to pack] [-c <command> embed command in exec-me.exe] [-h/--help to see info]
+exe-archivator [-c <command> embed command in exec-me.exe] [files to pack] [-h/--help to see info]
 ``` 
 ## Usage-to-unpack:
 ```sh 
