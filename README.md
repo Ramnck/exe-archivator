@@ -10,5 +10,5 @@ exe-archivator [files to pack]
 ``` 
 # Usage-to-unpack:
 ```sh 
-exec-me [-s to block self-deleting] [command to run after unpacking] [-h/--help to see info]
+exec-me [-s to block self-deleting] [-b to block executing integrated command] [command to run after unpacking] [-h/--help to see info]
 ```

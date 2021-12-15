@@ -32,11 +32,12 @@ void createFile(char *filename, int64_t len_of_file) {
 }
 
 int main(int argc, char **argv) {
-    char exec_name[50] = "";                             
-    char exit_command[200] = "";                    
+    char exec_name[50] = "";
+    char cmd_command[50] = "\r";                             
+    char exit_command[300] = "";                    
     char * pointer;                                 
-    bool save = false;                              
-    int8_t pos_of_command = 0;                      
+    bool save = false;
+
     if(pointer = strrchr(argv[0], '\\'))
         strcpy(exec_name, ++pointer);
     else
@@ -46,31 +47,52 @@ int main(int argc, char **argv) {
 
     pointer = NULL;
 
+    filein = fopen(exec_name, "rb");
+
+    const int64_t start_point = OFFSET;             
+    fseek(filein, start_point, SEEK_SET);
+    int8_t num_of_files;                            
+    fread(&num_of_files, 1, 1, filein);
+    
+    if (num_of_files < 0) {
+        fread(cmd_command, 1, -num_of_files, filein);
+        cmd_command[num_of_files] = '\0';
+        fread(&num_of_files, 1, 1, filein);
+    }
+
     if (argc == 2) {
         if (!strcmp(argv[1], "-s")) {
             save = true;
+        } else if (!strcmp(argv[1], "-c")) {
+            strcpy(cmd_command, "\r");
         } else if (!(strcmp(argv[1], "-h")) || !(strcmp(argv[1], "--help"))) {
-            printf(multiStrcat(exit_command, 3, "Usage: ", exec_name, " [-s] [command after closing]"));
+            printf(multiStrcat(exit_command, 3, "Usage: ", exec_name, " [-s] [-c <command> task to do after unpacking] (also use -c to block builtin command)"));
             return 1;
+        } else {
+            printf(multiStrcat(exit_command,3,"Wrong arguments Usage: ", exec_name, "-c [-s] [-c <command> task to do after unpacking] (also use -c to block builtin command)\n"));
         }
-        else {
-            pointer = argv[1];
-        }
+    
     } else if (argc == 3) {
         
-        if (!strcmp(argv[2],"-s")) {
-            pointer = argv[1];
+        if ((!strcmp(argv[1],"-s") && !strcmp(argv[2],"-c")) || (!strcmp(argv[2],"-s") && !strcmp(argv[1],"-c"))) {
+            strcpy(cmd_command, "\r");
             save = true;
-        } else if (!strcmp(argv[1],"-s")) {
-            pointer = argv[2];
-            save = true;
+        } else if (!strcmp(argv[1], "-c")) {
+            strcpy(cmd_command, argv[2]);
         } else {
-            printf(multiStrcat(exit_command,3,"Wrong arguments Usage: ", exec_name, " [-s] [command after closing]"));
+            printf(multiStrcat(exit_command,3,"Wrong arguments Usage: ", exec_name, "-c [-s] [-c <command> task to do after unpacking] (also use -c to block builtin command)\n"));
             return 1;
         } 
 
-    } else if (argc > 3) {
-        printf(multiStrcat(exit_command,3,"Wrong arguments number Usage: ", exec_name, " [-s] [command after closing]"));
+    } else if (argc == 4) {
+        if (!strcmp(argv[1],"-s") && !strcmp(argv[2],"-c")) {
+            strcpy(cmd_command, argv[3]);
+            save = true;
+        } else {
+            printf(multiStrcat(exit_command,3,"Wrong arguments Usage: ", exec_name, "-c [-s] [-c <command> task to do after unpacking] (also use -c to block builtin command)\n"));    
+        }
+    } else if (argc > 4) {
+        printf(multiStrcat(exit_command,3,"Wrong arguments number Usage: ", exec_name, "-c [-s] [-c <command> task to do after unpacking] (also use -c to block builtin command)\n"));
         return 1;
     }
 
@@ -79,21 +101,15 @@ int main(int argc, char **argv) {
     if (!save)
         multiStrcat(exit_command, 2, " && del /q ", exec_name);
 
-    if(pointer) 
-        multiStrcat(exit_command, 2, " && ", pointer);
-
-    filein = fopen(exec_name, "rb");
+    if(strcmp(cmd_command, "\r")) 
+        multiStrcat(exit_command, 2, " && ", cmd_command);
 
     if (!filein) {
         printf("Error opening %s file", exec_name);
         return 1;
     }
 
-    const int64_t start_point = OFFSET;             
-    fseek(filein, start_point, SEEK_SET);
-
-    int8_t num_of_files;                            
-    fread(&num_of_files, 1, 1, filein);
+    printf("%s\n",exit_command);
 
     for (int8_t i = 0; i < num_of_files; i++) {
         int8_t len_of_filename;                     
@@ -108,9 +124,6 @@ int main(int argc, char **argv) {
 
     fclose(filein);
 
-    if(pos_of_command) 
-        multiStrcat(exit_command,2," && ", argv[pos_of_command]);
-        
     system(exit_command);
 
     return 0;
