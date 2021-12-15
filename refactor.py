@@ -10,7 +10,7 @@ lines = [i.replace('"', '\\"') for i in lines]
 lines = [i.replace('%s', '%%s') for i in lines]
 lines = [i.replace('\n', '\\n') for i in lines]
 lines = [i.replace('777', '%d') for i in lines]
-print(*lines)
+# print(*lines)
 with open('source_code.h','w') as f:
     f.write('#pragma once\nchar source_code[] = "')
     for i in lines:
