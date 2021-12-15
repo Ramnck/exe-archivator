@@ -6,7 +6,7 @@
 ;
 using namespace std;
 
-long filesize(FILE * &file) {
+long long filesize(FILE * &file) {
     fseek(file , 0 , SEEK_END);
     long size = ftell(file);
     rewind(file);
@@ -15,13 +15,18 @@ long filesize(FILE * &file) {
 
 void writeFile(char * filename, FILE * &dest_file) {
     FILE * temp_file = fopen(filename, "rb");
+    if (!temp_file) {
+        printf("Error opening %s\n", filename);
+        exit(1);
+    }
     char len_of_filename = strlen(filename);
-    int len_of_file = filesize(temp_file);
+    long long len_of_file = filesize(temp_file);
+    // printf("%s's length is %ld\n", filename, len_of_file);
     fwrite(&len_of_filename, 1, 1, dest_file);
     fwrite(filename, 1, len_of_filename, dest_file);
-    fwrite(&len_of_file, 4, 1, dest_file);
+    fwrite(&len_of_file, 8, 1, dest_file);
     char temp_char;
-    int r_bytes;
+    long long r_bytes;
     char* temp_chars = new char[MB]; 
     while (r_bytes = fread(temp_chars, 1, MB, temp_file)) 
         fwrite(temp_chars, 1, r_bytes, dest_file);
@@ -35,7 +40,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
         
-    int offset = 0;
+    long long offset = 0;
     // Определяем позицию байта с которой начинается информация (offset)
     FILE * source = fopen("temp_a.c", "w+"), *compiled;
 
@@ -47,13 +52,9 @@ int main(int argc, char **argv) {
     fprintf(source, source_code, offset);
     fclose(source);
     // printf("Now its gonna be gcc temp_a.exe\n");
-#ifdef WIN32
     system("gcc -s -g0 temp_a.c -o temp_a.exe");
     while(!(compiled = fopen("temp_a.exe", "r"))) {
-#else
-    system("gcc -s -g0 temp_a.c -o temp_a.out");
-    while(!(compiled = fopen("temp_a.out", "r"))) {
-#endif
+
         // printf("wait\n");
         Sleep(10);
     }
@@ -64,19 +65,12 @@ int main(int argc, char **argv) {
     source = fopen("temp_a.c", "w+");
     fprintf(source, source_code, offset);
     fclose(source);
-#ifdef WIN32
     system("gcc -s -g0 temp_a.c -o exec-me.exe");
     while(!(compiled = fopen("exec-me.exe", "rb+")))
         Sleep(10);
     system("del /q temp_a.c");
     system("del /q temp_a.exe");
-#else
-    system("gcc -s -g0 temp_a.c -o exec-me.out");
-    while(!(compiled = fopen("exec-me.out", "rb+")))
-        Sleep(10);
-    system("rm temp_a.c")
-    system("rm temp_a.out")
-#endif
+
     // Скомпилировали конечный исполняемый файл
     char num_of_files = argc - 1;
     fseek(compiled , 0 , SEEK_END);
