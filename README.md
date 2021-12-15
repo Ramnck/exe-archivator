@@ -1,8 +1,14 @@
 # exe-archivator 
-Program that make special .exe/.out , which contains additional files which are unpacked when .exe/.out is run  
+Program that make exec-me.exe , which contains additional files which are unpacked when exec-me.exe is run  
 # Compiling
+```sh
 make
+```
 # Usage-to-pack: 
-exe-archivator [files to pack] 
-# Usage-to-unpack: 
+```sh
+exe-archivator [files to pack]
+``` 
+# Usage-to-unpack:
+```sh 
 exec-me [-s to block self-deleting] [command to run when files are unpacked] [-h/--help to see info]
+```

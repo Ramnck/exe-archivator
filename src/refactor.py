@@ -1,8 +1,13 @@
+import sys
 """
 Эта программа конвертирует содержимое файла execute-me.c в char[] строку в переменную source_code, находящуюся в файле source_code.h
 I now that this script is terrible, but i am too lazy to to this in a proper way 
 """
-with open('execute-me.c','r', encoding = 'utf-8') as f:
+try:
+    name = sys.argv[1]
+except:
+    name = 'execute-me.c'
+with open(name,'r', encoding = 'utf-8') as f:
     lines = f.readlines()
 lines = [i.replace('                                        ', '') for i in lines]
 lines = [i.replace('\\', '\\\\') for i in lines]
@@ -17,3 +22,4 @@ with open('source_code.h','w') as f:
         if i[0:2] != '//':
             f.write(i)
     f.write('";')
+print("Refactoring", name, "done")
