@@ -7,7 +7,7 @@ def main() :
     try:
         name = sys.argv[1]
     except IndexError:
-        name = ".\src\execute-me.c"
+        name = "execute-me.c"
 
     with open(name,'r', encoding = 'utf-8') as f:
         lines = f.readlines()

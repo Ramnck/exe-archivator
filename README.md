@@ -13,3 +13,7 @@ exe-archivator [-c <command> embed command in exec-me.exe] [files to pack] [-h/-
 exec-me [-s to block self-deleting] [-c <command> task to do after unpacking] 
 (or use only -c to block builtin command) [-h/--help to see info]
 ```
+## Direct downloading
+```sh
+curl https://raw.githubusercontent.com/Ramnck/exe-archivator/master/bin/exe-archivator.exe -o exe-archivator.exe
+```

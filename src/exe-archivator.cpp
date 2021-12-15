@@ -35,11 +35,11 @@ void writeFile(char * filename, FILE * &dest_file) {
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        printf("Usage: exe-archivator [-c <command> task to do after unpacking] [files to pack]\n");
+        printf("[-h | --help] to see info\n\n");
         exit(1);
     }
     if (!(strcmp(argv[1], "-h")) || !(strcmp(argv[1], "--help"))) {
-        printf("Usage: exe-archivator [-c <command> task to do after unpacking] [files to pack]\n");
+        printf("Usage: exe-archivator [-c <command> task to do after unpacking] [files to pack] [-h | --help to see this message]\n");
         exit(1);
     }
 
@@ -57,6 +57,13 @@ int main(int argc, char **argv) {
         strcpy(builtin_command, argv[2]);
         files = argv + 3;
         num_of_files -= 2;
+    } else {
+        for (int i = 2; i < argc; i++) {
+            if(!strcmp(argv[i], "-c")) {
+                printf("Wrong -c usage, [-h | --help] to see info\n");
+                exit(1);
+            }
+        }
     }
     long long offset = 0;
     FILE * source = fopen("temp_a.c", "w+"), *compiled;
