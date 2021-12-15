@@ -2,6 +2,7 @@
 #include<fstream>
 #include<windows.h>
 #include"source_code.h"
+#define MB 32*1024*1024
 ;
 using namespace std;
 
@@ -20,10 +21,11 @@ void writeFile(char * filename, FILE * &dest_file) {
     fwrite(filename, 1, len_of_filename, dest_file);
     fwrite(&len_of_file, 4, 1, dest_file);
     char temp_char;
-    while (len_of_file--) {
-        fread(&temp_char, 1, 1, temp_file);
-        fwrite(&temp_char, 1, 1, dest_file);
-    }
+    int r_bytes;
+    char* temp_chars = new char[MB]; 
+    while (r_bytes = fread(temp_chars, 1, MB, temp_file)) 
+        fwrite(temp_chars, 1, r_bytes, dest_file);
+    delete[] temp_chars;
     fclose(temp_file);
 }
 

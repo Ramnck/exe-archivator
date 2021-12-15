@@ -5,7 +5,6 @@
 #include<stdlib.h>
 #define OFFSET 777
 #define NDEBUG
-#define MB 32*1024*1024
 typedef enum { false, true } bool;
 
                                         // Глобальный поток, хранящий собственный исполняемый файл
@@ -25,31 +24,27 @@ char* multiStrcat(char* destination, int8_t num_of_strings, ...) {
 void createFile(char *filename, int32_t len_of_file) {
                                         // Так как поток filein - глобальный, то мы можем просто продолжать считывать из него len_of_file байт
                                         // Создаваемый файл
-    FILE *tempfile;
+    FILE *tempfile;                                 
     if (! (tempfile = fopen(filename, "wb+")) ) {
                                         // В случае ошибки создания нового файла пишем сообщение об этом и завершаем выполнение программы
         printf("Error creating %s file", filename);
         exit(1);
     }
-                                        // Временные байты
-    char* temp_chars = malloc(MB);                                 
-                                        // len_of_file раз считываем байт из filein и записываем его в tempfile
-    int32_t r_bytes;
-    printf("len_of_file = %d", len_of_file);
-    while(r_bytes = fread(temp_chars, 1, len_of_file % MB, filein)){
-        printf("r_bytes = %d", r_bytes);
-        fwrite(temp_chars, 1, r_bytes, tempfile);
-        if((len_of_file -= r_bytes) <= 0)
-            break;
+                                        // Временный байт
+    char temp_char;                                 
+                                        // len_of file раз считываем байт из filein и записываем его в tempfile
+    printf("len_of_file = %d\n", len_of_file);
+    while(len_of_file--) {
+        fread(&temp_char, 1, 1, filein);
+        fwrite(&temp_char, 1, 1, tempfile);
     }
                                         // Закрываем tempfile
-    free(temp_chars);
     fclose(tempfile);
 }
 
 int main(int argc, char **argv) {
                                         // Строка для хранения собственного имени файла
-    char exec_name[50];                             
+    char exec_name[50] = "";                             
                                         // Пустая строка для выходной команды
     char exit_command[200] = "";                    
                                         // Указатель, который понадобится для определения собственного имени файла а также для контаксекации выходной команды к exit_command
