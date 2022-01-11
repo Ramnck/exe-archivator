@@ -21,6 +21,7 @@ void writeFile(char * filename, FILE * &dest_file) {
     }
     char len_of_filename = strlen(filename);
     long long len_of_file = filesize(temp_file);
+    if(!strpbrk(filename, "/\\")) filename = strpbrk(filename, "/\\");
     fwrite(&len_of_filename, 1, 1, dest_file);
     fwrite(filename, 1, len_of_filename, dest_file);
     fwrite(&len_of_file, 8, 1, dest_file);
